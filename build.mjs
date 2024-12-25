@@ -5,6 +5,11 @@ import xml2js from "xml2js";
 import chalk from "chalk";
 import inquirer from "inquirer";
 
+// Helper function to ensure CRLF line endings
+function convertToCRLF(content) {
+  return content.replace(/\n/g, "\r\n");
+}
+
 // Load the build.yaml file
 function loadYaml(filePath) {
   try {
@@ -108,7 +113,7 @@ async function updateMetaFiles(metaFolder, spawnCodes, vehicleData, buildData) {
     }
 
     const updatedContent = builder.buildObject(parsedXml);
-    fs.writeFileSync(filePath, updatedContent, "utf8");
+    fs.writeFileSync(filePath, convertToCRLF(updatedContent), "utf8");
     console.log(chalk.green(`Updated ${file}`));
   }
 }
@@ -130,7 +135,7 @@ function updateUlcFile(ulcFilePath, spawnCodes) {
     console.log(chalk.green(`Replaced ${originalModelName} with ${spawnCode}`));
   }
 
-  fs.writeFileSync(ulcFilePath, ulcContent, "utf8");
+  fs.writeFileSync(ulcFilePath, convertToCRLF(ulcContent), "utf8");
   console.log(chalk.green("ULC script updated successfully."));
 }
 
