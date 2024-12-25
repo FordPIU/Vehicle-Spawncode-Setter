@@ -123,7 +123,10 @@ function updateUlcFile(ulcFilePath, spawnCodes) {
 
   let ulcContent = fs.readFileSync(ulcFilePath, "utf8");
   for (const [originalModelName, spawnCode] of Object.entries(spawnCodes)) {
-    ulcContent = ulcContent.replaceAll(originalModelName, spawnCode);
+    ulcContent = ulcContent.replaceAll(
+      `"${originalModelName}"`,
+      `"${spawnCode}"`
+    );
     console.log(chalk.green(`Replaced ${originalModelName} with ${spawnCode}`));
   }
 
