@@ -7,7 +7,9 @@ import inquirer from "inquirer";
 
 // Helper function to ensure CRLF line endings
 function convertToCRLF(content) {
-  return content.replace(/\n/g, "\r\n");
+  content = content.replaceAll(/\n/g, "\r\n");
+  content = content.replaceAll("&#xD;", "");
+  return content;
 }
 
 // Load the build.yaml file
@@ -135,7 +137,7 @@ function updateUlcFile(ulcFilePath, spawnCodes) {
     console.log(chalk.green(`Replaced ${originalModelName} with ${spawnCode}`));
   }
 
-  fs.writeFileSync(ulcFilePath, convertToCRLF(ulcContent), "utf8");
+  fs.writeFileSync(ulcFilePath, ulcContent, "utf8");
   console.log(chalk.green("ULC script updated successfully."));
 }
 
