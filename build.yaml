@@ -1,4 +1,22 @@
 data:
+  02tahoe:
+    audio: "POLICE"
+    handling: "vsn02tahoeS"
+  09charger:
+    audio: "npolchar"
+    handling: "vsn08chargerS"
+  11cvpi:
+    audio: "cvpiv8"
+    handling: "11CVPI"
+  13fpiu:
+    audio: "ecoboostv6"
+    handling: "13FPIU"
+  14charger:
+    audio: "npolchar"
+    handling: "14CHARGER"
+  14tahoe:
+    audio: "granger"
+    handling: "14TAHOE"
   16fpiu:
     audio: "ecoboostv6"
     handling: "18FPIS"
@@ -25,159 +43,79 @@ data:
     handling: "20RAM"
 
 vehicles:
-  ## Taurus
-  24cenator16sedan:
+  vsn11cvpi:
+    data: "11cvpi" # link to data
+    code: "bcrpd#" # auto increment
+  vsn11cvpiS:
+    data: "11cvpi" # link to data
+    code: "bcrpds#" # auto increment
+
+  vsn13fpiu:
+    data: "13fpiu" # link to data
+    code: "bcrpd#" # auto increment
+  vsn13fpiuS:
+    data: "13fpiu" # link to data
+    code: "bcrpds#" # auto increment
+
+  vsn13taurus:
     data: "18fpis" # link to data
-    code: "sspdta#" # auto increment
-  24cenator16sedan2:
+    code: "bcrpd#" # auto increment
+  vsn13taurusS:
     data: "18fpis" # link to data
-    code: "sspdtanp#" # auto increment
-  24cenator16sedan3:
-    data: "18fpis" # link to data
-    code: "sspd#" # auto increment
-  24cenator16sedan4:
-    data: "18fpis" # link to data
-    code: "sspdnp#" # auto increment
-  24cenator16sedan5:
-    data: "18fpis" # link to data
-    code: "sspds#" # auto increment
-  24cenator16sedan6:
-    data: "18fpis" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 16 Explorer
-  24cenator16utility:
+    code: "bcrpds#" # auto increment
+
+  vsn14charger:
+    data: "14charger" # link to data
+    code: "bcrpd#" # auto increment
+  vsn14chargerS:
+    data: "14charger" # link to data
+    code: "bcrpds#" # auto increment
+
+  vsn14tahoe:
+    data: "14tahoe" # link to data
+    code: "bcrpd#" # auto increment
+  vsn14tahoeS:
+    data: "14tahoe" # link to data
+    code: "bcrpds#" # auto increment
+
+  vsn16fpiu:
     data: "16fpiu" # link to data
-    code: "sspdta#" # auto increment
-  24cenator16utility2:
+    code: "bcrpd#" # auto increment
+  vsn16fpiuS:
     data: "16fpiu" # link to data
-    code: "sspdtanp#" # auto increment
-  24cenator16utility3:
-    data: "16fpiu" # link to data
-    code: "sspd#" # auto increment
-  24cenator16utility4:
-    data: "16fpiu" # link to data
-    code: "sspdnp#" # auto increment
-  24cenator16utility5:
-    data: "16fpiu" # link to data
-    code: "sspds#" # auto increment
-  24cenator16utility6:
-    data: "16fpiu" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 18 Charger
-  24cenator18sedan:
+    code: "bcrpds#" # auto increment
+  
+  vsn18charger:
     data: "18charger" # link to data
-    code: "sspdta#" # auto increment
-  24cenator18sedan2:
+    code: "bcrpd#" # auto increment
+  vsn18chargerS:
     data: "18charger" # link to data
-    code: "sspdtanp#" # auto increment
-  24cenator18sedan3:
-    data: "18charger" # link to data
-    code: "sspd#" # auto increment
-  24cenator18sedan4:
-    data: "18charger" # link to data
-    code: "sspdnp#" # auto increment
-  24cenator18sedan5:
-    data: "18charger" # link to data
-    code: "sspds#" # auto increment
-  24cenator18sedan6:
-    data: "18charger" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 18 Tahoe
-  24cenator18suv:
-    data: "18tahoe" # link to data
-    code: "sspdta#" # auto increment
-  24cenator18suv2:
-    data: "18tahoe" # link to data
-    code: "sspdtanp#" # auto increment
-  24cenator18suv3:
-    data: "18tahoe" # link to data
-    code: "sspd#" # auto increment
-  24cenator18suv4:
-    data: "18tahoe" # link to data
-    code: "sspdnp#" # auto increment
-  24cenator18suv5:
-    data: "18tahoe" # link to data
-    code: "sspds#" # auto increment
-  24cenator18suv6:
-    data: "18tahoe" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 20 Explorer
-  24cenator20utility:
-    data: "20fpiu" # link to data
-    code: "sspdta#" # auto increment
-  24cenator20utility2:
-    data: "20fpiu" # link to data
-    code: "sspdtanp#" # auto increment
-  24cenator20utility3:
-    data: "20fpiu" # link to data
-    code: "sspd#" # auto increment
-  24cenator20utility4:
-    data: "20fpiu" # link to data
-    code: "sspdnp#" # auto increment
-  24cenator20utility5:
-    data: "20fpiu" # link to data
-    code: "sspds#" # auto increment
-  24cenator20utility6:
-    data: "20fpiu" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 20 Explorer K9
-  24cenator20utilityk9:
-    data: "20fpiu" # link to data
-    code: "sspdknta#" # auto increment
-  24cenator20utilityk92:
-    data: "20fpiu" # link to data
-    code: "sspdkntanp#" # auto increment
-  24cenator20utilityk93:
-    data: "20fpiu" # link to data
-    code: "sspdkn#" # auto increment
-  24cenator20utilityk94:
-    data: "20fpiu" # link to data
-    code: "sspdknnp#" # auto increment
-  24cenator20utilityk95:
-    data: "20fpiu" # link to data
-    code: "sspdkns#" # auto increment
-  24cenator20utilityk96:
-    data: "20fpiu" # link to data
-    code: "sspdknsnp#" # auto increment
-  ## 20 RAM 1500
-  24cenator1500r5:
-    data: "20ram" # link to data
-    code: "sspds#" # auto increment
-  24cenator1500r6:
-    data: "20ram" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 20 RAM 2500
-  24cenator2500r5:
-    data: "20ram" # link to data
-    code: "sspds#" # auto increment
-  24cenator2500r6:
-    data: "20ram" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 20 RAM 3500
-  24cenator3500r5:
-    data: "20ram" # link to data
-    code: "sspds#" # auto increment
-  24cenator3500r6:
-    data: "20ram" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 18 F-150
-  24cenator15005:
+    code: "bcrpds#" # auto increment
+
+  vsn18f150:
     data: "18f150" # link to data
-    code: "sspds#" # auto increment
-  24cenator15006:
+    code: "bcrpd#" # auto increment
+  vsn18f150S:
     data: "18f150" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 18 F-250
-  24cenator25005:
-    data: "18f250" # link to data
-    code: "sspds#" # auto increment
-  24cenator25006:
-    data: "18f250" # link to data
-    code: "sspdsnp#" # auto increment
-  ## 18 F-350
-  24cenator35005:
-    data: "18f250" # link to data
-    code: "sspds#" # auto increment
-  24cenator35006:
-    data: "18f250" # link to data
-    code: "sspdsnp#" # auto increment
+    code: "bcrpds#" # auto increment
+
+  vsn18tahoe:
+    data: "18tahoe" # link to data
+    code: "bcrpd#" # auto increment
+  vsn18tahoeS:
+    data: "18tahoe" # link to data
+    code: "bcrpds#" # auto increment
+
+  vsn20fpiu:
+    data: "20fpiu" # link to data
+    code: "bcrpd#" # auto increment
+  vsn20fpiuS:
+    data: "20fpiu" # link to data
+    code: "bcrpds#" # auto increment
+
+  vsn08chargerS:
+    data: "09charger" # link to data
+    code: "bcrpds#" # auto increment
+  vsn02tahoeS:
+    data: "02tahoe" # link to data
+    code: "bcrpds#" # auto increment

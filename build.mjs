@@ -120,6 +120,89 @@ async function updateMetaFiles(metaFolder, spawnCodes, vehicleData, buildData) {
   }
 }
 
+// Update metadata XML files, with targeted subfolder
+async function updateMetaFiles2(
+  metaFolder,
+  spawnCodes,
+  vehicleData,
+  buildData
+) {
+  console.log(chalk.cyan("Updating metadata files..."));
+  const parser = new xml2js.Parser();
+  const builder = new xml2js.Builder();
+
+  // Loop through the spawnCodes to target specific subfolders for each spawn code
+  for (const spawnCode in spawnCodes) {
+    const spawnCodeFolder = path.join(metaFolder, spawnCode);
+    const metaFiles = ["vehicles.meta", "carvariations.meta"];
+
+    // Ensure that the spawnCode folder exists
+    if (!fs.existsSync(spawnCodeFolder)) {
+      console.warn(
+        chalk.yellow(`Spawn code folder not found: ${spawnCodeFolder}`)
+      );
+      continue;
+    }
+
+    // Loop through the meta files (vehicles.meta and carvariations.meta)
+    for (const file of metaFiles) {
+      const filePath = path.join(spawnCodeFolder, file);
+
+      // If the file does not exist in the subfolder, skip it
+      if (!fs.existsSync(filePath)) {
+        console.warn(chalk.yellow(`Metadata file not found: ${file}`));
+        continue;
+      }
+
+      const content = fs.readFileSync(filePath, "utf8");
+      const parsedXml = await parser.parseStringPromise(content);
+
+      // Process vehicles.meta
+      if (file === "vehicles.meta") {
+        parsedXml.CVehicleModelInfo__InitDataList.InitDatas[0].Item.forEach(
+          (item) => {
+            const originalModelName = item.modelName[0];
+            const spawnCodeForModel = spawnCodes[originalModelName];
+            if (spawnCodeForModel) {
+              const dataRef = buildData[originalModelName].data;
+              item.modelName[0] = spawnCodeForModel;
+              item.txdName[0] = spawnCodeForModel;
+              item.gameName[0] = spawnCodeForModel;
+              item.handlingId[0] = vehicleData[dataRef].handling;
+              item.audioNameHash[0] = vehicleData[dataRef].audio;
+              console.log(
+                chalk.green(`Updated vehicles.meta for ${originalModelName}`)
+              );
+            }
+          }
+        );
+      }
+
+      // Process carvariations.meta
+      if (file === "carvariations.meta") {
+        parsedXml.CVehicleModelInfoVariation.variationData[0].Item.forEach(
+          (item) => {
+            const originalModelName = item.modelName[0];
+            const spawnCodeForModel = spawnCodes[originalModelName];
+            if (spawnCodeForModel) {
+              item.modelName[0] = spawnCodeForModel;
+              console.log(
+                chalk.green(
+                  `Updated carvariations.meta for ${originalModelName}`
+                )
+              );
+            }
+          }
+        );
+      }
+
+      const updatedContent = builder.buildObject(parsedXml);
+      fs.writeFileSync(filePath, convertToCRLF(updatedContent), "utf8");
+      console.log(chalk.green(`Updated ${file} in ${spawnCodeFolder}`));
+    }
+  }
+}
+
 // Update ULC script
 function updateUlcFile(ulcFilePath, spawnCodes) {
   console.log(chalk.cyan("Updating ULC script..."));
@@ -151,8 +234,10 @@ async function main() {
       message: "What would you like to update?",
       choices: [
         "Update everything",
+        "Update everything with meta vehicle folders",
         "Update only spawn codes",
         "Update only meta files",
+        "Update only meta files with meta vehicle folders",
         "Update only ULC",
       ],
     },
@@ -184,12 +269,32 @@ async function main() {
       updateUlcFile(ulcFilePath, spawnCodes);
       break;
 
+    case "Update everything with meta vehicle folders":
+      renameVehicleFiles(streamFolder, spawnCodes);
+      await updateMetaFiles2(
+        metaFolder,
+        spawnCodes,
+        vehicleData,
+        vehicleEntries
+      );
+      updateUlcFile(ulcFilePath, spawnCodes);
+      break;
+
     case "Update only spawn codes":
       renameVehicleFiles(streamFolder, spawnCodes);
       break;
 
     case "Update only meta files":
       await updateMetaFiles(
+        metaFolder,
+        spawnCodes,
+        vehicleData,
+        vehicleEntries
+      );
+      break;
+
+    case "Update only meta files with meta vehicle folders":
+      await updateMetaFiles2(
         metaFolder,
         spawnCodes,
         vehicleData,
