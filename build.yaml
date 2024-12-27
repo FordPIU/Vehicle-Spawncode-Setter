@@ -1,3 +1,6 @@
+modifier:
+  carcol: "6"
+
 data:
   02tahoe:
     audio: "POLICE"
@@ -8,6 +11,9 @@ data:
   11cvpi:
     audio: "cvpiv8"
     handling: "11CVPI"
+  11imp:
+    audio: "WINDSOR"
+    handling: "13IMPALA"
   13fpiu:
     audio: "ecoboostv6"
     handling: "13FPIU"
@@ -20,9 +26,15 @@ data:
   16fpiu:
     audio: "ecoboostv6"
     handling: "18FPIS"
+  16ram:
+    audio: "SHERIFF2"
+    handling: "14RAM"
   18charger:
     audio: "npolchar"
     handling: "18CHARGER"
+  20durango:
+    audio: "WINDSOR"
+    handling: "21DURANGO"
   18f150:
     audio: "aq02coyotef150"
     handling: "18F150"
@@ -35,87 +47,210 @@ data:
   18tahoe:
     audio: "fbi2"
     handling: "18TAHOE"
+  19yukon:
+    audio: "BALLER3"
+    handling: "19yukonslick"
+  19gmc:
+    audio: "SADLER"
+    handling: "19SIERRA"
   20fpiu:
     audio: "ecoboostv6"
     handling: "20FPIU"
   20ram:
     audio: "fbi2"
     handling: "20RAM"
+  21f150lightning:
+    audio: "SURGE"
+    handling: "23lightproslick"
+  22tahoe:
+    audio: "fbi2"
+    handling: "21TAHOE"
+  24camaro:
+    audio: "INTRUDER"
+    handling: "24camslick"
+  24mustang:
+    audio: "GAUNTLET"
+    handling: "24musslick"
+  gator:
+    audio: "BLAZER"
+    handling: "BLAZER"
 
 vehicles:
-  vsn11cvpi:
-    data: "11cvpi" # link to data
-    code: "bcrpd#" # auto increment
-  vsn11cvpiS:
-    data: "11cvpi" # link to data
-    code: "bcrpds#" # auto increment
-
-  vsn13fpiu:
-    data: "13fpiu" # link to data
-    code: "bcrpd#" # auto increment
-  vsn13fpiuS:
-    data: "13fpiu" # link to data
-    code: "bcrpds#" # auto increment
-
-  vsn13taurus:
-    data: "18fpis" # link to data
-    code: "bcrpd#" # auto increment
-  vsn13taurusS:
-    data: "18fpis" # link to data
-    code: "bcrpds#" # auto increment
-
-  vsn14charger:
-    data: "14charger" # link to data
-    code: "bcrpd#" # auto increment
-  vsn14chargerS:
-    data: "14charger" # link to data
-    code: "bcrpds#" # auto increment
-
-  vsn14tahoe:
-    data: "14tahoe" # link to data
-    code: "bcrpd#" # auto increment
-  vsn14tahoeS:
-    data: "14tahoe" # link to data
-    code: "bcrpds#" # auto increment
-
-  vsn16fpiu:
-    data: "16fpiu" # link to data
-    code: "bcrpd#" # auto increment
-  vsn16fpiuS:
-    data: "16fpiu" # link to data
-    code: "bcrpds#" # auto increment
-  
-  vsn18charger:
-    data: "18charger" # link to data
-    code: "bcrpd#" # auto increment
-  vsn18chargerS:
-    data: "18charger" # link to data
-    code: "bcrpds#" # auto increment
-
-  vsn18f150:
-    data: "18f150" # link to data
-    code: "bcrpd#" # auto increment
-  vsn18f150S:
-    data: "18f150" # link to data
-    code: "bcrpds#" # auto increment
-
-  vsn18tahoe:
-    data: "18tahoe" # link to data
-    code: "bcrpd#" # auto increment
-  vsn18tahoeS:
-    data: "18tahoe" # link to data
-    code: "bcrpds#" # auto increment
-
-  vsn20fpiu:
-    data: "20fpiu" # link to data
-    code: "bcrpd#" # auto increment
-  vsn20fpiuS:
-    data: "20fpiu" # link to data
-    code: "bcrpds#" # auto increment
-
-  vsn08chargerS:
+  10charg:
     data: "09charger" # link to data
-    code: "bcrpds#" # auto increment
-  vsn02tahoeS:
-    data: "02tahoe" # link to data
-    code: "bcrpds#" # auto increment
+    code: "lscso#" # auto increment
+  10chargslick:
+    data: "09charger" # link to data
+    code: "lscsos#" # auto increment
+
+  11cvpi:
+    data: "11cvpi" # link to data
+    code: "lscso#" # auto increment
+  11cvpislick:
+    data: "11cvpi" # link to data
+    code: "lscsos#" # auto increment
+
+  11imp:
+    data: "11cvpi" # link to data
+    code: "lscso#" # auto increment
+  11impslick:
+    data: "11cvpi" # link to data
+    code: "lscsos#" # auto increment
+
+  14charg:
+    data: "14charger" # link to data
+    code: "lscso#" # auto increment
+  14chargslick:
+    data: "14charger" # link to data
+    code: "lscsos#" # auto increment
+  14chargk9:
+    data: "14charger" # link to data
+    code: "lscsokn#" # auto increment
+  14chargslickk9:
+    data: "14charger" # link to data
+    code: "lscsokns#" # auto increment
+
+  14tahoe:
+    data: "14tahoe" # link to data
+    code: "lscso#" # auto increment
+  14tahoeslick:
+    data: "14tahoe" # link to data
+    code: "lscsos#" # auto increment
+  14tahoek9:
+    data: "14tahoe" # link to data
+    code: "lscsokn#" # auto increment
+  14tahoeslickk9:
+    data: "14tahoe" # link to data
+    code: "lscsokns#" # auto increment
+
+  18tahoe:
+    data: "18tahoe" # link to data
+    code: "lscso#" # auto increment
+  18tahoeslick:
+    data: "18tahoe" # link to data
+    code: "lscsos#" # auto increment
+
+  18tau:
+    data: "18fpis" # link to data
+    code: "lscso#" # auto increment
+  18tauslick:
+    data: "18fpis" # link to data
+    code: "lscsos#" # auto increment
+
+  20charg:
+    data: "18charger" # link to data
+    code: "lscso#" # auto increment
+  20chargslick:
+    data: "18charger" # link to data
+    code: "lscsos#" # auto increment
+  20chargk9:
+    data: "18charger" # link to data
+    code: "lscsokn#" # auto increment
+  20chargk9slick:
+    data: "18charger" # link to data
+    code: "lscsokns#" # auto increment
+
+  20dur:
+    data: "20durango" # link to data
+    code: "lscso#" # auto increment
+  20durslick:
+    data: "20durango" # link to data
+    code: "lscsos#" # auto increment
+
+  20fpiu:
+    data: "20fpiu" # link to data
+    code: "lscso#" # auto increment
+  20fpiuslick:
+    data: "20fpiu" # link to data
+    code: "lscsos#" # auto increment
+  20fpiuk9:
+    data: "20fpiu" # link to data
+    code: "lscsokn#" # auto increment
+  20fpiuslickk9:
+    data: "20fpiu" # link to data
+    code: "lscsokns#" # auto increment
+
+  2013fpiu:
+    data: "13fpiu" # link to data
+    code: "lscso#" # auto increment
+  2013fpiuslick:
+    data: "13fpiu" # link to data
+    code: "lscsos#" # auto increment
+  2013fpiuk9:
+    data: "13fpiu" # link to data
+    code: "lscsokn#" # auto increment
+  2013fpiuslickk9:
+    data: "13fpiu" # link to data
+    code: "lscsokns#" # auto increment
+
+  2016fpiu:
+    data: "16fpiu" # link to data
+    code: "lscso#" # auto increment
+  2016fpiuslick:
+    data: "16fpiu" # link to data
+    code: "lscsos#" # auto increment
+  2016fpiuk9:
+    data: "16fpiu" # link to data
+    code: "lscsokn#" # auto increment
+  2016fpiuslickk9:
+    data: "16fpiu" # link to data
+    code: "lscsokns#" # auto increment
+
+  2016ram:
+    data: "16ram" # link to data
+    code: "lscso#" # auto increment
+  2016ramslick:
+    data: "16ram" # link to data
+    code: "lscsos#" # auto increment
+  2016ramk9:
+    data: "16ram" # link to data
+    code: "lscsokn#" # auto increment
+  2016ramslickk9:
+    data: "16ram" # link to data
+    code: "lscsokns#" # auto increment
+
+  2018f150:
+    data: "18f150" # link to data
+    code: "lscso#" # auto increment
+  2018f150slick:
+    data: "18f150" # link to data
+    code: "lscsos#" # auto increment
+  2018f150k9:
+    data: "18f150" # link to data
+    code: "lscsokn#" # auto increment
+  2018f150slickk9:
+    data: "18f150" # link to data
+    code: "lscsokns#" # auto increment
+
+  2019gmc:
+    data: "19gmc" # link to data
+    code: "lscso#" # auto increment
+  2019gmcslick:
+    data: "19gmc" # link to data
+    code: "lscsos#" # auto increment
+
+  2022tahoe:
+    data: "22tahoe" # link to data
+    code: "lscso#" # auto increment
+  2022tahoeslick:
+    data: "22tahoe" # link to data
+    code: "lscsos#" # auto increment
+
+  19yukonslick:
+    data: "19yukon" # link to data
+    code: "lscsos#" # auto increment
+  24camslick:
+    data: "24camaro" # link to data
+    code: "lscsos#" # auto increment
+  24musslick:
+    data: "24mustang" # link to data
+    code: "lscsos#" # auto increment
+  22rtslick:
+    data: "18charger" # link to data
+    code: "lscsos#" # auto increment
+  23lightproslick:
+    data: "21f150lightning" # link to data
+    code: "lscsos#" # auto increment
+  legacygator:
+    data: "gator" # link to data
+    code: "lscsogat#" # auto increment

@@ -5,14 +5,11 @@ import xml2js from "xml2js";
 import chalk from "chalk";
 import inquirer from "inquirer";
 
-// Helper function to ensure CRLF line endings
-function convertToCRLF(content) {
-  content = content.replaceAll(/\n/g, "\r\n");
-  content = content.replaceAll("&#xD;", "");
-  return content;
-}
+const buildYamlPath = path.resolve("./build.yaml");
+const streamFolder = path.resolve("./build/stream");
+const metaFolder = path.resolve("./build/meta");
+const ulcFilePath = path.resolve("./build/ulc.lua");
 
-// Load the build.yaml file
 function loadYaml(filePath) {
   try {
     console.log(chalk.cyan(`Loading YAML file: ${filePath}`));
@@ -23,6 +20,92 @@ function loadYaml(filePath) {
     console.error(chalk.red(`Failed to load YAML: ${err.message}`));
     process.exit(1);
   }
+}
+
+async function parseXmlFile(filePath) {
+  const xmlData = fs.readFileSync(filePath, "utf8");
+
+  try {
+    const result = await xml2js.parseStringPromise(xmlData);
+
+    return result;
+  } catch (err) {
+    console.error(`Error parsing XML in file ${filePath}:`, err);
+
+    return null;
+  }
+}
+
+function unparseXmlFile(parsedData) {
+  const builder = new xml2js.Builder();
+
+  return builder.buildObject(parsedData);
+}
+
+async function findMetaFiles(recursive) {
+  let vehicles = [];
+  let carvariations = [];
+  let carcols = [];
+  let folder = recursive || metaFolder;
+  const files = fs.readdirSync(folder);
+
+  for (let file of files) {
+    let filePath = path.join(folder, file);
+    let stats = fs.lstatSync(filePath);
+
+    if (stats.isDirectory()) {
+      const {
+        vehicles: subVehicles,
+        carvariations: subCarvariations,
+        carcols: subCarcols,
+      } = await findMetaFiles(filePath);
+
+      vehicles = [...vehicles, ...(subVehicles || [])];
+      carvariations = [...carvariations, ...(subCarvariations || [])];
+      carcols = [...carcols, ...(subCarcols || [])];
+    } else {
+      switch (file) {
+        case "vehicles.meta":
+          let vehicleData = await parseXmlFile(filePath);
+
+          vehicles.push({
+            path: filePath,
+            contents: vehicleData,
+          });
+          break;
+
+        case "carvariations.meta":
+          let carvarData = await parseXmlFile(filePath);
+
+          carvariations.push({
+            path: filePath,
+            contents: carvarData,
+          });
+          break;
+
+        case "carcols.meta":
+          let carcolData = await parseXmlFile(filePath);
+
+          carcols.push({
+            path: filePath,
+            contents: carcolData,
+          });
+          break;
+
+        default:
+          break;
+      }
+    }
+  }
+
+  return { vehicles, carvariations, carcols };
+}
+
+// Helper function to ensure CRLF line endings
+function convertToCRLF(content) {
+  content = content.replaceAll(/\n/g, "\r\n");
+  content = content.replaceAll("&#xD;", "");
+  return content;
 }
 
 // Auto-increment spawn codes based on the prefix pattern
@@ -62,145 +145,118 @@ function renameVehicleFiles(streamFolder, spawnCodes) {
 }
 
 // Update metadata XML files
-async function updateMetaFiles(metaFolder, spawnCodes, vehicleData, buildData) {
-  console.log(chalk.cyan("Updating metadata files..."));
-  const parser = new xml2js.Parser();
-  const builder = new xml2js.Builder();
-
-  const metaFiles = ["vehicles.meta", "carvariations.meta"];
-  for (const file of metaFiles) {
-    const filePath = path.join(metaFolder, file);
-    if (!fs.existsSync(filePath)) {
-      console.warn(chalk.yellow(`Metadata file not found: ${file}`));
-      continue;
-    }
-
-    const content = fs.readFileSync(filePath, "utf8");
-    const parsedXml = await parser.parseStringPromise(content);
-
-    // Process vehicles
-    if (file === "vehicles.meta") {
-      parsedXml.CVehicleModelInfo__InitDataList.InitDatas[0].Item.forEach(
-        (item) => {
-          const originalModelName = item.modelName[0];
-          const spawnCode = spawnCodes[originalModelName];
-          if (spawnCode) {
-            const dataRef = buildData[originalModelName].data;
-            item.modelName[0] = spawnCode;
-            item.txdName[0] = spawnCode;
-            item.gameName[0] = spawnCode;
-            item.handlingId[0] = vehicleData[dataRef].handling;
-            item.audioNameHash[0] = vehicleData[dataRef].audio;
-            console.log(
-              chalk.green(`Updated vehicles.meta for ${originalModelName}`)
-            );
-          }
-        }
-      );
-    }
-
-    if (file === "carvariations.meta") {
-      parsedXml.CVehicleModelInfoVariation.variationData[0].Item.forEach(
-        (item) => {
-          const originalModelName = item.modelName[0];
-          const spawnCode = spawnCodes[originalModelName];
-          if (spawnCode) {
-            item.modelName[0] = spawnCode;
-            console.log(
-              chalk.green(`Updated carvariations.meta for ${originalModelName}`)
-            );
-          }
-        }
-      );
-    }
-
-    const updatedContent = builder.buildObject(parsedXml);
-    fs.writeFileSync(filePath, convertToCRLF(updatedContent), "utf8");
-    console.log(chalk.green(`Updated ${file}`));
-  }
-}
-
-// Update metadata XML files, with targeted subfolder
-async function updateMetaFiles2(
-  metaFolder,
+async function updateMetaFiles(
+  vehiclesArray,
+  carvarArray,
   spawnCodes,
   vehicleData,
   buildData
 ) {
-  console.log(chalk.cyan("Updating metadata files..."));
-  const parser = new xml2js.Parser();
-  const builder = new xml2js.Builder();
+  vehiclesArray.forEach((vehicleMetaFile) => {
+    let vehicleMetaFilePath = vehicleMetaFile.path;
+    let vehicleMetaData = vehicleMetaFile.contents;
 
-  // Loop through the spawnCodes to target specific subfolders for each spawn code
-  for (const spawnCode in spawnCodes) {
-    const spawnCodeFolder = path.join(metaFolder, spawnCode);
-    const metaFiles = ["vehicles.meta", "carvariations.meta"];
+    vehicleMetaData.CVehicleModelInfo__InitDataList.InitDatas[0].Item.forEach(
+      (item) => {
+        const originalModelName = item.modelName[0].toLowerCase();
+        const spawnCode = spawnCodes[originalModelName];
+        if (spawnCode) {
+          const dataRef = buildData[originalModelName].data;
+          item.modelName[0] = spawnCode;
+          item.txdName[0] = spawnCode;
+          item.gameName[0] = spawnCode;
+          item.handlingId[0] = vehicleData[dataRef].handling;
+          item.audioNameHash[0] = vehicleData[dataRef].audio;
+          console.log(
+            chalk.green(`Updated vehicles.meta for ${originalModelName}`)
+          );
+        }
+      }
+    );
 
-    // Ensure that the spawnCode folder exists
-    if (!fs.existsSync(spawnCodeFolder)) {
-      console.warn(
-        chalk.yellow(`Spawn code folder not found: ${spawnCodeFolder}`)
-      );
-      continue;
+    fs.writeFileSync(
+      vehicleMetaFilePath,
+      convertToCRLF(unparseXmlFile(vehicleMetaData)),
+      "utf-8"
+    );
+  });
+
+  carvarArray.forEach((carvariationMetaFile) => {
+    let carvarMetaFilePath = carvariationMetaFile.path;
+    let carvarMetaData = carvariationMetaFile.contents;
+
+    carvarMetaData.CVehicleModelInfoVariation.variationData[0].Item.forEach(
+      (item) => {
+        const originalModelName = item.modelName[0].toLowerCase();
+        const spawnCode = spawnCodes[originalModelName];
+        if (spawnCode) {
+          item.modelName[0] = spawnCode;
+          console.log(
+            chalk.green(`Updated carvariations.meta for ${originalModelName}`)
+          );
+        }
+      }
+    );
+
+    fs.writeFileSync(
+      carvarMetaFilePath,
+      convertToCRLF(unparseXmlFile(carvarMetaData)),
+      "utf-8"
+    );
+  });
+}
+
+// Update carcols files
+async function fixModkits(carcolArray, prefix) {
+  carcolArray.forEach((carcolFile) => {
+    let carcolPath = carcolFile.path;
+    let carcolData = carcolFile.contents;
+
+    // Log the start of processing the carcol file
+    console.log(chalk.blue(`Processing file: ${carcolPath}`));
+
+    try {
+      carcolData?.CVehicleModelInfoVarGlobal?.Kits?.forEach((kit, kitIndex) => {
+        kit.Item?.forEach((item, itemIndex) => {
+          if (item.kitName != null && item.id != null) {
+            // Log before updating the item id
+            console.log(
+              chalk.yellow(
+                `Modifying kit ID: ${item.id[0]["$"].value} (Kit ${
+                  kitIndex + 1
+                }, Item ${itemIndex + 1})`
+              )
+            );
+
+            // Add prefix to item id
+            item.id[0]["$"].value = (prefix || "") + item.id[0]["$"].value;
+
+            // Log after modification
+            console.log(
+              chalk.green(`Updated kit ID: ${item.id[0]["$"].value}`)
+            );
+          }
+        });
+      });
+    } catch (err) {
+      // Log any errors encountered during the loop
+      console.log(chalk.red(`Error processing file: ${carcolPath}`));
+      console.error(chalk.red(err));
     }
 
-    // Loop through the meta files (vehicles.meta and carvariations.meta)
-    for (const file of metaFiles) {
-      const filePath = path.join(spawnCodeFolder, file);
+    // Log that the file is being written
+    console.log(chalk.blue(`Writing updated file: ${carcolPath}`));
 
-      // If the file does not exist in the subfolder, skip it
-      if (!fs.existsSync(filePath)) {
-        console.warn(chalk.yellow(`Metadata file not found: ${file}`));
-        continue;
-      }
+    // Write the updated data back to the file
+    fs.writeFileSync(
+      carcolPath,
+      convertToCRLF(unparseXmlFile(carcolData)),
+      "utf-8"
+    );
 
-      const content = fs.readFileSync(filePath, "utf8");
-      const parsedXml = await parser.parseStringPromise(content);
-
-      // Process vehicles.meta
-      if (file === "vehicles.meta") {
-        parsedXml.CVehicleModelInfo__InitDataList.InitDatas[0].Item.forEach(
-          (item) => {
-            const originalModelName = item.modelName[0];
-            const spawnCodeForModel = spawnCodes[originalModelName];
-            if (spawnCodeForModel) {
-              const dataRef = buildData[originalModelName].data;
-              item.modelName[0] = spawnCodeForModel;
-              item.txdName[0] = spawnCodeForModel;
-              item.gameName[0] = spawnCodeForModel;
-              item.handlingId[0] = vehicleData[dataRef].handling;
-              item.audioNameHash[0] = vehicleData[dataRef].audio;
-              console.log(
-                chalk.green(`Updated vehicles.meta for ${originalModelName}`)
-              );
-            }
-          }
-        );
-      }
-
-      // Process carvariations.meta
-      if (file === "carvariations.meta") {
-        parsedXml.CVehicleModelInfoVariation.variationData[0].Item.forEach(
-          (item) => {
-            const originalModelName = item.modelName[0];
-            const spawnCodeForModel = spawnCodes[originalModelName];
-            if (spawnCodeForModel) {
-              item.modelName[0] = spawnCodeForModel;
-              console.log(
-                chalk.green(
-                  `Updated carvariations.meta for ${originalModelName}`
-                )
-              );
-            }
-          }
-        );
-      }
-
-      const updatedContent = builder.buildObject(parsedXml);
-      fs.writeFileSync(filePath, convertToCRLF(updatedContent), "utf8");
-      console.log(chalk.green(`Updated ${file} in ${spawnCodeFolder}`));
-    }
-  }
+    // Log the successful write
+    console.log(chalk.green(`Successfully wrote updated file: ${carcolPath}`));
+  });
 }
 
 // Update ULC script
@@ -234,50 +290,43 @@ async function main() {
       message: "What would you like to update?",
       choices: [
         "Update everything",
-        "Update everything with meta vehicle folders",
         "Update only spawn codes",
         "Update only meta files",
-        "Update only meta files with meta vehicle folders",
         "Update only ULC",
+        "Update only modkits",
       ],
     },
   ]);
 
   // Set paths and data
-  const buildYamlPath = path.resolve("./build.yaml");
   const buildData = loadYaml(buildYamlPath);
-
-  const streamFolder = path.resolve("./build/stream");
-  const metaFolder = path.resolve("./build/meta");
-  const ulcFilePath = path.resolve("./build/ulc.lua");
-
+  const metaData = await findMetaFiles();
   const vehicleData = buildData.data;
   const vehicleEntries = buildData.vehicles;
-
   const spawnCodes = autoIncrementSpawnCodes(vehicleEntries);
 
   // Perform the updates based on the user's choice
   switch (updateChoice) {
     case "Update everything":
+      const { selectedPrefix1 } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "selectedPrefix1",
+          message: "What should be the prefix for modkit ids?",
+          choices: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+        },
+      ]);
+
       renameVehicleFiles(streamFolder, spawnCodes);
       await updateMetaFiles(
-        metaFolder,
+        metaData.vehicles,
+        metaData.carvariations,
         spawnCodes,
         vehicleData,
         vehicleEntries
       );
       updateUlcFile(ulcFilePath, spawnCodes);
-      break;
-
-    case "Update everything with meta vehicle folders":
-      renameVehicleFiles(streamFolder, spawnCodes);
-      await updateMetaFiles2(
-        metaFolder,
-        spawnCodes,
-        vehicleData,
-        vehicleEntries
-      );
-      updateUlcFile(ulcFilePath, spawnCodes);
+      await fixModkits(metaData.carcols, selectedPrefix1);
       break;
 
     case "Update only spawn codes":
@@ -286,16 +335,8 @@ async function main() {
 
     case "Update only meta files":
       await updateMetaFiles(
-        metaFolder,
-        spawnCodes,
-        vehicleData,
-        vehicleEntries
-      );
-      break;
-
-    case "Update only meta files with meta vehicle folders":
-      await updateMetaFiles2(
-        metaFolder,
+        metaData.vehicles,
+        metaData.carvariations,
         spawnCodes,
         vehicleData,
         vehicleEntries
@@ -304,6 +345,18 @@ async function main() {
 
     case "Update only ULC":
       updateUlcFile(ulcFilePath, spawnCodes);
+      break;
+
+    case "Update only modkits":
+      const { selectedPrefix } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "selectedPrefix",
+          message: "What should be the prefix for modkit ids?",
+          choices: ["1", "2", "3", "4", "5", "6", "7", "8", "9"],
+        },
+      ]);
+      await fixModkits(metaData.carcols, selectedPrefix);
       break;
 
     default:
